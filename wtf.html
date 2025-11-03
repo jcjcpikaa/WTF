@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>WTF?! — Little Reaction Page</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;600;800&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#0f1724;
+      --glass: rgba(255,255,255,0.06);
+      --accent:#ff3b30;
+      --accent2:#ff9f1c;
+      --muted: #9aa4b2;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;font-family:Inter,system-ui,Segoe UI,Arial;background:linear-gradient(120deg,#071126 0%, #0f1724 60%);color:#eef2f7}
+    .wrap{min-height:100vh;display:grid;place-items:center;padding:32px}
+    .card{width:min(980px,96vw);background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));border-radius:18px;padding:36px;box-shadow:0 10px 30px rgba(2,6,23,0.6);backdrop-filter: blur(6px);position:relative;overflow:hidden}
+    .headline{display:flex;gap:20px;align-items:center}
+    .badge{background:linear-gradient(90deg,var(--accent),var(--accent2));padding:12px 18px;border-radius:14px;font-weight:800;font-size:20px;letter-spacing:1px}
+    h1{margin:0;font-size:clamp(34px,6vw,56px);line-height:0.9}
+    p.lead{color:var(--muted);margin:8px 0 20px}
+    .controls{display:flex;gap:12px;flex-wrap:wrap}
+    button{background:var(--glass);border:1px solid rgba(255,255,255,0.06);color:inherit;padding:10px 14px;border-radius:10px;cursor:pointer;font-weight:600}
+    button.primary{background:linear-gradient(90deg,var(--accent),var(--accent2));border:none;color:#081426}
+    .panel{display:flex;gap:18px;align-items:center}
+    .react-box{flex:1;background:rgba(255,255,255,0.02);padding:24px;border-radius:12px;min-height:160px;display:flex;flex-direction:column;justify-content:center;align-items:center}
+    .reaction{font-size:clamp(36px,8vw,96px);font-weight:900;margin:0;transform-origin:center;transition:transform .25s ease}
+    .sub{color:var(--muted);margin-top:10px}
+    .footer{display:flex;justify-content:space-between;align-items:center;margin-top:18px;color:var(--muted);font-size:14px}
+    .confetti{pointer-events:none;position:absolute;inset:0}
+
+    /* small animation */
+    @keyframes pop {0%{transform:scale(.95)}50%{transform:scale(1.12)}100%{transform:scale(1)}}
+    .pop{animation:pop .45s cubic-bezier(.17,.67,.12,1.08)}
+
+    /* accessibility */
+    button:focus{outline:3px solid rgba(255,255,255,0.08)}
+
+    @media (max-width:640px){.headline{flex-direction:column;align-items:flex-start}.panel{flex-direction:column}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card" role="main" aria-labelledby="title">
+      <canvas id="confetti" class="confetti" width="1600" height="900"></canvas>
+      <div class="headline">
+        <div class="badge" aria-hidden="true">REACT</div>
+        <div>
+          <h1 id="title">WTF?!</h1>
+          <p class="lead">A tiny interactive reaction page — click the buttons below to express (or soften) your reaction.</p>
+        </div>
+      </div>
+
+      <div class="panel" style="margin-top:18px">
+        <div class="react-box" aria-live="polite">
+          <p id="reaction" class="reaction">WTF!?</p>
+          <div class="sub" id="explain">Something unexpected happened — beep boop.</div>
+        </div>
+
+        <div style="min-width:220px;display:flex;flex-direction:column;gap:12px">
+          <div class="controls">
+            <button id="btnPop" class="" title="Pop reaction">Pop</button>
+            <button id="btnConfetti" class="primary" title="Make it big">Confetti</button>
+          </div>
+
+          <div class="controls">
+            <button id="btnTame">Tame it (family)</button>
+            <button id="btnCopy">Copy</button>
+          </div>
+
+          <div style="font-size:13px;color:var(--muted)">Tip: Use the keyboard — press <kbd>Space</kbd> to pop.</div>
+        </div>
+      </div>
+
+      <div class="footer">
+        <div>Made for fun • Non‑commercial</div>
+        <div>Accessible & small</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Simple pop animation
+    const reaction = document.getElementById('reaction');
+    const explain = document.getElementById('explain');
+    const btnPop = document.getElementById('btnPop');
+    const btnConfetti = document.getElementById('btnConfetti');
+    const btnTame = document.getElementById('btnTame');
+    const btnCopy = document.getElementById('btnCopy');
+
+    function pop(){
+      reaction.classList.remove('pop');
+      void reaction.offsetWidth; // reflow
+      reaction.classList.add('pop');
+      // tiny shuffle of text
+      reaction.textContent = ['WTF!?','WHAT THE...','W T F','Whaaaat?!','🤯'][Math.floor(Math.random()*5)];
+      explain.textContent = ['Debug time.','Unexpected value received.','Seriously?','Hold up...','Well that escalated quickly.'][Math.floor(Math.random()*5)];
+    }
+
+    btnPop.addEventListener('click', pop);
+    document.body.addEventListener('keydown', (e)=>{ if(e.code==='Space'){ e.preventDefault(); pop(); } });
+
+    // Tame (family friendly)
+    let tame = false;
+    btnTame.addEventListener('click', ()=>{
+      tame = !tame;
+      if(tame){
+        reaction.textContent = "What's This?!";
+        explain.textContent = 'A surprising situation — keep calm.';
+        btnTame.textContent = 'Untame';
+      } else {
+        reaction.textContent = 'WTF!?';
+        explain.textContent = 'Something unexpected happened — beep boop.';
+        btnTame.textContent = 'Tame it (family)';
+      }
+      pop();
+    });
+
+    // Copy to clipboard
+    btnCopy.addEventListener('click', async ()=>{
+      try{
+        await navigator.clipboard.writeText(reaction.textContent + ' — ' + explain.textContent);
+        btnCopy.textContent = 'Copied!';
+        setTimeout(()=>btnCopy.textContent='Copy',900);
+      }catch(e){
+        btnCopy.textContent = 'Copy (fail)';
+        setTimeout(()=>btnCopy.textContent='Copy',900);
+      }
+    });
+
+    // Confetti (very small, no external libs)
+    const canvas = document.getElementById('confetti');
+    const ctx = canvas.getContext('2d');
+    const DPR = Math.max(1, window.devicePixelRatio || 1);
+    function resizeCanvas(){
+      canvas.width = canvas.clientWidth * DPR;
+      canvas.height = canvas.clientHeight * DPR;
+      ctx.scale(DPR, DPR);
+    }
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    function makeConfettiBurst(){
+      const pieces = [];
+      for(let i=0;i<80;i++){
+        pieces.push({
+          x: Math.random()*canvas.clientWidth,
+          y: Math.random()*canvas.clientHeight*0.2 + 20,
+          vx: (Math.random()-0.5)*8,
+          vy: Math.random()*6+2,
+          size: Math.random()*8+4,
+          rot: Math.random()*360,
+          vr: (Math.random()-0.5)*10,
+          color: ['#ff3b30','#ff9f1c','#ffd166','#7bd389','#6ad1ff'][Math.floor(Math.random()*5)],
+        });
+      }
+      let t=0;
+      function frame(){
+        ctx.clearRect(0,0,canvas.width/DPR,canvas.height/DPR);
+        t+=1;
+        for(const p of pieces){
+          p.x += p.vx; p.y += p.vy; p.vy += 0.25; p.rot += p.vr;
+          ctx.save();
+          ctx.translate(p.x, p.y);
+          ctx.rotate(p.rot*Math.PI/180);
+          ctx.fillStyle = p.color;
+          ctx.fillRect(-p.size/2, -p.size/2, p.size, p.size*0.6);
+          ctx.restore();
+        }
+        if(t<140) requestAnimationFrame(frame);
+        else ctx.clearRect(0,0,canvas.width/DPR,canvas.height/DPR);
+      }
+      frame();
+    }
+
+    btnConfetti.addEventListener('click', ()=>{
+      makeConfettiBurst();
+      pop();
+    });
+
+    // initial pop
+    setTimeout(pop, 500);
+  </script>
+</body>
+</html>
